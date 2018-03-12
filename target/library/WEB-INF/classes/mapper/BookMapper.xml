@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lightning.library.mapper.BookMapper">
+  <resultMap id="BaseResultMap" type="com.lightning.library.pojo.Book">
+    <id column="book_id" jdbcType="INTEGER" property="book_id" />
+    <result column="book_title" jdbcType="VARCHAR" property="book_title" />
+    <result column="book_author" jdbcType="VARCHAR" property="book_author" />
+    <result column="book_publisher" jdbcType="VARCHAR" property="book_publisher" />
+    <result column="book_description" jdbcType="VARCHAR" property="book_description" />
+    <result column="book_stock" jdbcType="INTEGER" property="book_stock" />
+    <result column="book_location" jdbcType="VARCHAR" property="book_location" />
+    <result column="book_cid" jdbcType="VARCHAR" property="book_cid" />
+    <association property="category" column="book_cid" javaType="Category">
+      <id column="category_id" property="category_id"></id>
+      <result column="category_name" property="category_name"></result>
+    </association>
+  </resultMap>
+
+  <select id="get" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select *
+    from book
+    where book_id = #{book_id,jdbcType=INTEGER}
+  </select>
+
+  <select id="list" parameterType="Book" resultMap="BaseResultMap">
+    select * from book
+    <where>
+      <if test="bookCondition.category!=null and bookCondition.category.category_id!=null">
+        and book_cid=#{bookCondition.category.category_id}
+      </if>
+      <if test="bookCondition.book_title!=null">
+        and book_title like '%${bookCondition.book_title}%'
+      </if>
+    </where>
+  </select>
+
+  <delete id="delete" parameterType="java.lang.Integer">
+    delete from book
+    where book_id = #{book_id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="add" keyColumn="book_id" keyProperty="book_id" parameterType="com.lightning.library.pojo.Book" useGeneratedKeys="true">
+    insert into book (book_title, book_author, book_publisher, 
+      book_description, book_stock, book_location, 
+      book_cid)
+    values (#{book_title,jdbcType=VARCHAR}, #{book_author,jdbcType=VARCHAR}, #{book_publisher,jdbcType=VARCHAR}, 
+      #{book_description,jdbcType=VARCHAR}, #{book_stock,jdbcType=INTEGER}, #{book_location,jdbcType=VARCHAR}, 
+      #{book_cid,jdbcType=INTEGER})
+  </insert>
+
+  <update id="update" parameterType="Book">
+    update book
+    <set>
+      <if test="book_title != null">
+        book_title = #{book_title,jdbcType=VARCHAR},
+      </if>
+      <if test="book_author != null">
+        book_author = #{book_author,jdbcType=VARCHAR},
+      </if>
+      <if test="book_publisher != null">
+        book_publisher = #{book_publisher,jdbcType=VARCHAR},
+      </if>
+      <if test="book_description != null">
+        book_description = #{book_description,jdbcType=VARCHAR},
+      </if>
+      <if test="book_stock != null">
+        book_stock = #{book_stock,jdbcType=INTEGER},
+      </if>
+      <if test="book_location != null">
+        book_location = #{book_location,jdbcType=VARCHAR},
+      </if>
+      <if test="book_cid != null">
+        book_cid = #{book_cid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where book_id = #{book_id,jdbcType=INTEGER}
+  </update>
+</mapper>
